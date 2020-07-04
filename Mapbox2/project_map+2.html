@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8" />
+<title>Show and hide layers</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<style>
+#menu {
+background: #fff;
+position: absolute;
+z-index: 1;
+top: 10px;
+right: 10px;
+border-radius: 3px;
+width: 120px;
+border: 1px solid rgba(0, 0, 0, 0.4);
+font-family: 'Open Sans', sans-serif;
+}
+ 
+#menu a {
+font-size: 13px;
+color: #404040;
+display: block;
+margin: 0;
+padding: 0;
+padding: 10px;
+text-decoration: none;
+border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+text-align: center;
+}
+ 
+#menu a:last-child {
+border: none;
+}
+ 
+#menu a:hover {
+background-color: #f8f8f8;
+color: #404040;
+}
+ 
+#menu a.active {
+background-color: #3887be;
+color: #ffffff;
+}
+ 
+#menu a.active:hover {
+background: #3074a4;
+}
+</style>
+ 
+<nav id="menu"></nav>
+<div id="map"></div>
+ 
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlbnBlbmciLCJhIjoiY2owMTMxcXQyMDY1ZzMzb3hzaXRmYTdudCJ9.fNApMaplz9wxXMgrKzVf1w';
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/chenpeng/ckc4ijqrh0pw01ilhtagnq08k',
+zoom: 9.38,
+center: [13.504639,52.503164]
+});
+ 
+map.on('load', function() {
+    
+    var layers = map.getStyle().layers;
+ 
+    var labelLayerId;
+    for (var i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+        labelLayerId = layers[i].id;
+        break;
+        }
+    }
+    
+    map.addLayer(
+        {
+            'id': '3d-buildings',
+            'source': 'composite',
+            'source-layer': 'building',
+            'filter': ['==', 'extrude', 'true'],
+            'type': 'fill-extrusion',
+            'minzoom': 15,
+            'paint': {
+                 'fill-extrusion-color': '#aaa',
+ 
+                // use an 'interpolate' expression to add a smooth transition effect to the
+                // buildings as the user zooms in
+                'fill-extrusion-height': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    15,
+                    0,
+                    15.05,
+                    ['get', 'height']
+                ],
+                'fill-extrusion-base': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    15,
+                    0,
+                    15.05,
+                    ['get', 'min_height']
+                ],
+                'fill-extrusion-opacity': 0.6
+                     }       
+                },
+        labelLayerId   
+     );
+        
+//从这里开始--------------------------    
+// add source and layer for museums
+     map.addSource('artsmuseums-3vpjy0', {
+    type: 'vector',
+    url: 'mapbox://chenpeng.690pxcxn'
+    });
+    map.addLayer({
+    'id': 'arts',
+    'type': 'circle',
+    'minzoom': 9.5,
+    'source': 'artsmuseums-3vpjy0',
+    'source-layer': 'artsmuseums-3vpjy0',
+    'layout': {
+    // make layer visible by default
+        
+        'visibility': 'visible'
+    },
+        'paint': {
+            'circle-radius': 3,
+            'circle-color': '#f5a36d'
+            },
+            'source-layer': 'artsmuseums-3vpjy0'
+    });
+//到这里结束是一个完整的图层部分，复制内部一整段       
+    
+    
+// add source and layer for contours
+   map.addSource('bank-0p1bxa', {
+    type: 'vector',
+    url: 'mapbox://chenpeng.3h9z3p1m'
+    });
+    map.addLayer({
+    'id': 'bank',
+    'type': 'circle',
+    'minzoom': 9.5,
+    'source': 'bank-0p1bxa',
+    'source-layer': 'bank-0p1bxa',
+    'layout': {
+    // make layer visible by default
+        
+        'visibility': 'visible'
+    },
+        'paint': {
+            'circle-radius': 3,
+            'circle-color': '#f78a48'
+            },
+            'source-layer': 'bank-0p1bxa'
+    });
+});
+ 
+// enumerate ids of the layers
+var toggleableLayerIds = ['bank', 'arts'];
+ 
+// set up the corresponding toggle button for each layer
+for (var i = 0; i < toggleableLayerIds.length; i++) {
+var id = toggleableLayerIds[i];
+ 
+var link = document.createElement('a');
+link.href = '#';
+link.className = 'active';
+link.textContent = id;
+ 
+link.onclick = function(e) {
+var clickedLayer = this.textContent;
+e.preventDefault();
+e.stopPropagation();
+ 
+var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+ 
+// toggle layer visibility by changing the layout object's visibility property
+if (visibility === 'visible') {
+map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+this.className = '';
+} else {
+this.className = 'active';
+map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+}
+};
+ 
+var layers = document.getElementById('menu');
+layers.appendChild(link);
+}
+</script>
+ 
+</body>
+</html>
