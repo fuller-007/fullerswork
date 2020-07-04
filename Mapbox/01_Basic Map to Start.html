@@ -1,0 +1,51 @@
+<html>
+
+#setting basic style
+<head>
+    <title>My Mapbox GL JS Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+    
+    <style>
+
+        /*Change your style here*/
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100vw;	/* 100% of viewport width */
+            height: 100vh;	/* 100% of viewport height */
+        }    
+
+    </style>
+</head>
+
+
+
+<body>
+<div id="map"></div>
+</body>
+
+
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZnVsbGVyMTIzIiwiYSI6ImNrYzIyZ3d0MTBhNG0yeW9kM3VrNDJmYWEifQ.n9kGIxWJ5rdDLOafc-jb4A';
+/*replace it with your own accessToken */
+    
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/fuller123/ckc31gui80f9e1iqnnbuib1ob', 	
+/*replace it with your own style */
+
+    });    
+</script>
+
+
+</html>
